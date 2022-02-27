@@ -1,0 +1,132 @@
+---
+title: "Вклад человека в изменение климата"
+author: "Denis"
+date: "10 02 2022"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Введение
+
+
+  
+```{r loading-libs, message=FALSE}
+library(tidyverse)
+library(dslabs)
+library(ggthemes)
+```
+
+  
+```{r}
+data(temp_carbon)
+data(greenhouse_gases)
+data(historic_co2)
+```
+
+# 1. График временного ряда температурной аномалии.
+
+
+```{r, echo=FALSE}
+temp_carbon %>% filter(!is.na(temp_anomaly)) %>%
+  ggplot(aes(year, temp_anomaly)) + 
+  geom_line(color = 'red', size = 1) +
+  geom_hline(aes(yintercept = 0), col = "blue", size = 0.9) + 
+  geom_vline (aes(xintercept = 1940), col = "green", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1975), col = "violet", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1995), col = "orange", size = 0.9, linetype=2) +
+  geom_text(aes(x = 2000, y = 0.05, label = "Cредняя температура в 20 веке"), col = "blue") +
+  xlim(c(1900, 2018)) +
+  xlab("Годы") +
+  ylab("Температурная аномалия (градусов Цельсия)") +
+  ggtitle("Температурная аномалия относительно ср. знач. за 20 век, 1900-2018") +
+  theme_calc()
+```
+
+# 2. Добавляем график температурной аномалии в океане (темно-синяя линия) и на земле (темно-зеленая линия).
+
+
+```{r, echo=FALSE}
+temp_carbon %>% filter(!is.na(temp_anomaly)) %>%
+  ggplot(aes(year, temp_anomaly)) + 
+  geom_line(color = 'red', size = 1) +
+  geom_line(mapping = aes(year, ocean_anomaly), col = "darkblue", size = 1) + 
+  geom_line(mapping = aes(year, land_anomaly), col = "darkgreen", size = 1) +
+  geom_hline(aes(yintercept = 0), col = "blue", size = 0.9) + 
+  geom_vline (aes(xintercept = 1940), col = "green", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1975), col = "violet", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1995), col = "orange", size = 0.9, linetype=2) +
+  geom_text(aes(x = 2000, y = 0.05, label = "Cредняя температура в 20 веке"), col = "blue") +
+  xlim(c(1900, 2018)) +
+  xlab("Годы") +
+  ylab("Температурная аномалия (градусов Цельсия)") +
+  ggtitle("Температурная аномалия относительно ср. знач. за 20 век, 1900-2018") +
+  theme_calc()
+```
+
+# 3. График концентрации парниковых газов по годам. 
+
+```{r, echo=FALSE}
+greenhouse_gases %>%
+  ggplot(aes(year, concentration)) +
+  geom_line(aes(color = gas), size = 0.8) +
+  facet_grid(gas ~ ., scales = "free") +
+  geom_vline(aes(xintercept = 1850), col = "black", size = 1, linetype=5) +
+  xlab("Годы") +
+  ylab("Концентрация (ch4/n2o ppb, co2 ppm)") +
+  ggtitle("Концентрация парниковых газов в атмосфере по годам, 0-2000") +
+  theme_igray () +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "lightblue", 
+                                                                         size = 0.5, linetype = "solid", colour = "black"))
+```
+
+# 4. График временного ряда выбросов углерода. 
+
+
+```{r, echo=FALSE}
+temp_carbon %>% 
+  ggplot(aes(year, carbon_emissions)) + 
+  geom_line(color = 'red', size = 1) +
+  xlab("Годы") +
+  ylab("Углерод, выбрасываемый в год в метрических тоннах") +
+  ggtitle("Ежегодные глобальные выбросы углерода, 1751-2014") +
+  theme_igray ()
+```
+
+# 5. График концентрации СО2 с течением времени на основании непосредственных измерения концентрации co2 в атмосфере в Мауна-Лоа с 1959 г., а также косвенные измерения концентрации co2 в атмосфере в ледяных кернах возрастом 800 000 лет.
+
+
+```{r, echo=FALSE}
+co2_time <- historic_co2 %>% 
+  ggplot(aes(year, co2, color = source)) +  
+  geom_line(size = 1) +
+  xlab("Годы") +
+  ylab("CO2") +
+  ggtitle("Концентрация СО2 с течением времени") +
+  theme_hc() +
+  scale_color_manual(name="Источник",
+                     labels=c("Ледяные керны","Мауна-Лоа"),
+                     values=c("red","blue")) + 
+  theme(legend.background = element_rect(fill = "lightblue", size = 0.5, linetype = "solid", colour = "black"))
+co2_time
+```
+
+# 6. Графики аномального, даже взрывного роста концентрации CO2 
+
+```{r, echo=FALSE}
+co2_time + xlim(c(-800000, -775000))
+```
+
+
+
+```{r, echo=FALSE}
+co2_time + xlim(c(-375000, -330000))
+```
+
+
+
+```{r, echo=FALSE}
+co2_time + xlim(c(-3000, 2018))
+```

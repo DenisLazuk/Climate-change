@@ -1,0 +1,44 @@
+---
+title: "Report on Gun Murders"
+author: "Rafael Irizarry"
+date: "`r format(Sys.Date())`"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Libraries:
+
+```{r loading-libs, message=FALSE}
+library(tidyverse)
+library(dslabs)
+library(ggthemes)
+```
+  
+data:
+
+```{r}
+data(temp_carbon)
+data(greenhouse_gases)
+data(historic_co2)
+```
+
+# 1. Plot
+Anomaly
+
+```{r, echo=FALSE}
+temp_carbon %>% filter(!is.na(temp_anomaly)) %>%
+  ggplot(aes(year, temp_anomaly)) + 
+  geom_line(color = 'red', size = 1) +
+  geom_hline(aes(yintercept = 0), col = "blue", size = 0.9) + 
+  geom_vline (aes(xintercept = 1940), col = "green", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1975), col = "violet", size = 0.9, linetype=2) +
+  geom_vline (aes(xintercept = 1995), col = "orange", size = 0.9, linetype=2) +
+  geom_text(aes(x = 2000, y = 0.05, label = "Mean temp in 20 cent."), col = "blue") +
+  xlim(c(1900, 2018)) +
+  xlab("Years") +
+  ylab("Temp anomaly (degrees Celsius)") +
+  ggtitle("Temp anomaly relative to mean value in 20 cent., 1900-2018") +
+  theme_calc()
+```
